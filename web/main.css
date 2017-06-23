@@ -1,0 +1,81 @@
+body, html {
+    width: 100%;
+    height: 100%;
+}
+
+body, html, nav, ul, li, h1 {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #EEE;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.bar-left {
+    width: 100%;
+    background: #FFF;
+    border-bottom: #999 thick solid;
+}
+
+@media screen and (min-width: 1024px) {
+    .bar-left {
+        width: 450px;
+        padding: 0 10px;
+        min-height: 100%;
+        border-right: #999 thick solid;
+        border-bottom: none;
+    }
+}
+
+header {
+    background: rgb(200,240,255);
+    color: #000;
+    border-bottom: 10px solid rgb(80,156,240);
+    width: 100%;
+    height: 72px;
+    display: block;
+    margin: auto;
+}
+
+header #logo {
+    width: 48px;
+    height: 48px;
+    margin: 12px 24px 12px;
+    float: left;
+}
+
+header h1 {
+    padding: 8px 0 0;
+}
+header span {
+    font-style: italic;
+}
+
+nav {
+    float: right;
+}
+nav ul {
+    list-style: none;
+}
+nav ul li {
+    display: inline;
+}
+nav a {
+    display: inline-block;
+    min-width: 100px;
+    height: 50px;
+    margin: 6px;
+    line-height: 50px;
+    border: thin solid #CCC;
+    text-align: center;
+}
+nav a, nav a:hover {
+    color: #CCC;
+    text-decoration: none;
+}
+
+header::after{
+    clear: both;
+}

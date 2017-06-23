@@ -1,0 +1,5 @@
+#!/bin/bash
+
+CODEROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+(cd "$CODEROOT" && python3 boop.py)

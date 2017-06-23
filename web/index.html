@@ -23,10 +23,18 @@
             <li><a href="https://github.com/gauravmm/boop/issues/new">Bug?</a></li>
         </ul></nav>
         <h1>Boop!</h1>
-        <span>Scriptable notifications to your devices.</span>
     </header>
-    <div class="bar-left">
+    <div class="bar-left"><div class="bar-inner">
         <div id="notif-enable">Enable Notifications</div>
-    </div>
+        <div id="notif-enable-err" class="error">
+            <img src="alerticon.svg" class="alert" alt="!"/>
+            <div class="error-msg">
+                <span>Error!</span>
+                <p id="notif-enable-err-msg">
+                Unknown error occurred.
+                </p>
+            </div>
+        </div>
+    </div></div>
     <script src="js/main.js"></script></body>
 </html>

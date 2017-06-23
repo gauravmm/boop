@@ -91,6 +91,32 @@ header::after{
 
 /* Buttons */
 
+.button {
+    width: 100%;
+    height: 28px;
+    line-height: 28px;
+    margin: 0 0 8px 0;
+    border: thin solid #999;
+    color: #666;
+    text-align: center;
+    cursor: not-allowed;
+}
+
+.button-active {
+    border: thin solid #666;
+    background: #CEC0FB;
+    color: #000;
+    cursor: pointer;
+}
+
+.button-selected {
+    border: thin solid #666;
+    background: #B1499E;
+    color: #FFF;
+    cursor: pointer;
+}
+
+
 /* Error handling */
 .alert {
     width: 48px;

@@ -63,6 +63,7 @@ header #logo {
 header h1 {
     font-size: 24px;
     padding: 4px 0 0;
+    display: inline-block;
 }
 header span {
     font-style: italic;
@@ -77,6 +78,9 @@ nav ul {
 nav ul li {
     display: inline;
 }
+nav li:last-child {
+    margin-right: 10px;
+}
 nav a {
     display: inline-block;
     min-width: 100px;
@@ -89,6 +93,13 @@ nav a {
 nav a, nav a:hover {
     color: #EEE;
     text-decoration: none;
+}
+nav a#device-name {
+    background: #407cc0;
+    font-style: italic;
+}
+nav a:hover, nav a#device-name:hover {
+    background: #84b9f4;
 }
 
 header::after{

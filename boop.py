@@ -4,7 +4,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
-from objects import RegManager
+from objects import RegManager, StyleManager
 from config import *
 from endpoints import ALL_ENDPOINTS, ERROR_500
 
@@ -25,6 +25,7 @@ logger = logging.getLogger("boop")
 #
 notifyMan = RegManager(CLIENT_MANAGER, MAX_CLIENTS)
 pusherMan = RegManager(PUSHER_MANAGER, MAX_CLIENTS)
+styleMan  = StyleManager(STYLE_MANAGER, MAX_CLIENTS)
 
 #
 # Handler
@@ -36,6 +37,7 @@ class BoopHTTPHandler(http.server.BaseHTTPRequestHandler):
             "headers": self.headers,
             "clients": notifyMan,
             "pushers": pusherMan,
+            "styles" : styleMan,
         }
         try:
             for endpt in ALL_ENDPOINTS:

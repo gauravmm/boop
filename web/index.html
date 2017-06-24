@@ -21,16 +21,11 @@
         <nav><ul>
             <li><a href="https://github.com/gauravmm/boop">GitHub</a></li>
             <li><a href="https://github.com/gauravmm/boop/issues/new">Bug?</a></li>
+            <li><a href="#" id="device-name"></a></li>
         </ul></nav>
         <h1>Boop!</h1>
     </header>
     <div class="bar-left"><div class="bar-inner">
-        <button id="notif-enable" class="button button-disabled" disabled>
-            <span class="if-notif-error">Notifications Are Not Supported On This Device</span>
-            <span class="if-notif-processing">Processing...</span>
-            <span class="if-notif-enabled">Disable Notifications On This Device</span>
-            <span class="if-notif-disabled">Enable Notifications On This Device</span>
-        </button>
         <div id="notif-enable-err" class="hidden">
             <img src="alerticon.svg" class="alert" alt="!"/>
             <div class="error-msg">
@@ -38,6 +33,13 @@
                 <p id="notif-enable-err-msg">Unknown error occurred.</p>
             </div>
         </div>
+        <button id="notif-enable" class="button button-disabled" disabled>
+            <span class="if-notif-error">Notifications Are Not Supported On This Device</span>
+            <span class="if-notif-processing">Processing...</span>
+            <span class="if-notif-enabled">Disable Notifications On This Device</span>
+            <span class="if-notif-disabled">Enable Notifications On This Device</span>
+        </button>
+        <ul id="client-list"></ul>
         <button id="pusher-new" class="button button-active" disabled>
             Push From A New Device
         </button>
@@ -47,6 +49,7 @@
             <h3>.bashrc</h3>
             <pre id="newpusher-bashrc" class="code"></pre>
         </div>
+        <ul id="pusher-list"></ul>
     </div></div>
     <div id="content">
     </div>

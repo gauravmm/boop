@@ -5,6 +5,8 @@ import pickle
 from collections import OrderedDict
 from pathlib import Path
 
+from config import STYLE_COLOR, STYLE_IMAGE
+
 logger = logging.getLogger("boop.regman")
 
 class RegManager(object):
@@ -52,6 +54,44 @@ class RegManager(object):
         return self.clients.__repr__()
 
 
+class StyleManager(object):
+    def __init__(self, fn, max_clients=20):
+        self.fn=Path(fn)
+        self.idx = 0
+        self.max_clients = max_clients
+        try:
+            self.names = pickle.loads(self.fn.read_bytes())
+        except:
+            logger.warn("StyleManager database does not exist or cannot be read. Starting with empty database.")
+            self.names = []
+    
+    def get(self, obj):
+        try:
+            idx = self.names.index(obj.name)
+        except:
+            # First try to find the first deleted slot
+            try:
+                idx = self.names.index(None)
+            except:
+                idx = len(self.names)
+
+            if idx <= self.max_clients:
+                self.names.append(obj.name)
+                self.fn.write_bytes(pickle.dumps(self.names))
+
+        idx = idx % len(STYLE_IMAGE)
+        return {
+            "icon": STYLE_IMAGE[idx],
+            "color": STYLE_COLOR[idx]
+        }
+
+    def anull(self, obj):
+        try:
+            idx = self.names.index(obj.name)
+            self.names[idx] = None
+        except:
+            pass
+
 class Client(object):
     def __init__(self, name, created, subscription, browser="", machine=""):
         self.name = name
@@ -61,8 +101,10 @@ class Client(object):
         self.browser = browser
         self.machine = machine
 
-    def getData(self):
-        return {k: self.__getattribute__(k) for k in ["name", "created", "lastseen", "browser", "machine"]}
+    def getData(self, **kwargs):
+        rv = {k: self.__getattribute__(k) for k in ["name", "created", "lastseen", "browser", "machine"]}
+        rv["style"] = kwargs["styles"].get(self)
+        return rv
 
 
 class Pusher(object):
@@ -72,5 +114,7 @@ class Pusher(object):
         self.lastseen = created
         self.secret = secret
 
-    def getData(self):
-        return {k: self.__getattribute__(k) for k in ["name", "lastseen", "created"]}
+    def getData(self, **kwargs):
+        rv = {k: self.__getattribute__(k) for k in ["name", "lastseen", "created"]}
+        rv["style"] = kwargs["styles"].get(self)
+        return rv

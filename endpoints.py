@@ -119,8 +119,8 @@ def _getconn(**kwargs):
     return returnJSON({
         "success": True,
         "message": "",
-        "clients": [v.getData() for v in kwargs["clients"].values()],
-        "pushers": [v.getData() for v in kwargs["pushers"].values()]
+        "clients": [v.getData(**kwargs) for v in kwargs["clients"].values()],
+        "pushers": [v.getData(**kwargs) for v in kwargs["pushers"].values()]
     })
 ALL_ENDPOINTS.append(EndpointHandler("GetConnectionHandler", "/getconn/", _getconn))
 

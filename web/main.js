@@ -77,7 +77,60 @@ function initializeUI() {
         }
         $("pusher-new").disabled = false;
         $("pusher-new").className = "button button-active";
+        
+        if(device_name)
+            $("device-name").innerText = device_name;
+
+        $("device-name").onclick = function() {
+            alert("Renaming has not been implemented, so if you want to rename this, it might require some manual tweaking.")
+            getAndUpdateName(true)
+        }
+
         updateButton();
+    }).catch(handleSetupError);
+    getDeviceStatus();
+}
+
+function deleteDevice(url) {
+    console.log(url)
+}
+
+function populateList(node, list) {
+    // Remove all children: https://stackoverflow.com/a/22966637
+    var cNode = node.cloneNode(false);
+    node.parentNode.replaceChild(cNode, node);
+    node = cNode
+
+    list.forEach(function(e) {
+        var root = document.createElement("li");
+        
+        var del = document.createElement("span");
+        del.innerText = "X";
+        del.className = "d-x"
+        del.onclick = ()=>deleteDevice(e.name);
+        root.appendChild(del);
+
+        var name = document.createElement("span");
+        name.innerText = e.name;
+        name.className = "d-name"
+        root.appendChild(name);
+
+        var since = document.createElement("span");
+        since.innerText = e.lastseen;
+        since.className = "d-since"
+        root.appendChild(since);
+
+        node.appendChild(root);
+    });
+
+    node.className = "";
+}
+
+function getDeviceStatus() {
+    fetch('/getconn/').then((r)=>r.json()).then(function(response) {
+        console.log("Conn:", response)
+        populateList($("client-list"), response.clients)
+        populateList($("pusher-list"), response.pushers)
     }).catch(handleSetupError);
 }
 
@@ -112,6 +165,7 @@ function getAndUpdateName(force=false){
             return null;
         }
         localStorage.setItem("name", device_name);
+        $("device-name").innerText = device_name;
     }
     return device_name;
 }

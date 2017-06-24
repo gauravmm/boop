@@ -14,5 +14,9 @@ ADMIN_EMAIL="gaurav@gauravmanek.com"
 
 CLIENT_MANAGER="clients.pickle"
 PUSHER_MANAGER="pushers.pickle"
+STYLE_MANAGER="style.pickle"
 MAX_CLIENTS=20
 MAX_DELAY=60
+
+STYLE_IMAGE=["icons/bell{}.png".format(x) for x in range(7)]
+STYLE_COLOR=["#C18F72", "#510068", "#FFBB53", "#FF6C51", "#00B0A0", "#2D393E", "#5B4F50"]

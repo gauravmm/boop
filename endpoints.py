@@ -10,10 +10,14 @@ from pathlib import Path
 from pywebpush import WebPushException, webpush
 
 from config import *
+from objects import Client, Pusher
 
 logger = logging.getLogger("boop.endpoints")
 
 ALL_ENDPOINTS = []
+
+lambda timestamp: int(time.time())
+
 class EndpointHandler(object):
     def __init__(self, name, endpt, func):
         self.name = name
@@ -50,9 +54,10 @@ def parsePath(nm, vars):
             kwargs["original_path_parts"]=path_parts[2:]
             path_parts = [urllib.parse.unquote_plus(p) for p in path_parts[2:]]
 
+            # logger.debug("Processing /{}/ with args: {}".format(nm, ",".join(path_parts)))
             args = []
             nargs = len(path_parts)
-            if vars[-1] == "*":
+            if vars and vars[-1] == "*":
                 nargs -= 1
                 args=path_parts[nargs:]
                 path_parts=path_parts[:nargs]
@@ -74,11 +79,9 @@ def parsePath(nm, vars):
 @parsePath("register", ["name", "sub"])
 def _reghandler(name, sub, **kwargs):
     sub = json.loads(sub)
-    logger.info("Registering {} with subscription {}.".format(name, sub))
-    message = kwargs["clients"].put(name, sub)
-    success = not message
-
-    return returnJSON({"success": success, "message": message})
+    logger.debug("Registering {} with subscription {}.".format(name, sub))
+    message = kwargs["clients"].put(name, Client(name, timestamp(), sub))
+    return returnJSON({"success": not message, "message": message})
 ALL_ENDPOINTS.append(EndpointHandler("RegistrationHandler", "/register/", _reghandler))
 
 
@@ -88,28 +91,41 @@ ALL_ENDPOINTS.append(EndpointHandler("RegistrationHandler", "/register/", _regha
 @parsePath("addpusher", ["name"])
 def _addpusherhandler(name, **kwargs):
     auth = str(uuid.uuid4())
-    logger.info("Adding Pusher {} with auth {}.".format(name, auth))
-    message = kwargs["pushers"].put(name, auth)
-    success = not message
-
-    return returnJSON({"success": success, "message": message, "auth": auth})
+    logger.debug("Adding Pusher {} with auth {}.".format(name, auth))
+    message = kwargs["pushers"].put(name, Pusher(name, timestamp(), auth))
+    return returnJSON({"success": not message, "message": message, "auth": auth})
 ALL_ENDPOINTS.append(EndpointHandler("AddPusherHandler", "/addpusher/", _addpusherhandler))
+
+
+#
+# /getconn/
+#
+@parsePath("getconn", [])
+def _getconn(**kwargs):
+    return returnJSON({
+        "success": True,
+        "message": "",
+        "clients": [v.getData() for v in kwargs["clients"].values()],
+        "pushers": [v.getData() for v in kwargs["pushers"].values()]
+    })
+ALL_ENDPOINTS.append(EndpointHandler("GetConnectionHandler", "/getconn/", _getconn))
 
 
 #
 # /push/name/sig/title/text/[args/]*
 #
 def _warnOut(s):
-    logger.warn(s)
+    logger.warn(s.strip())
     return returnStr(s)
 
 @parsePath("push", ["pusher_name", "sig", "timestamp", "title", "text", "*"])
 def _pushhandler(name, sig, timest, title, text="", *args, **kwargs):
     # Look up name to get secret
-    secret = kwargs["pushers"].get(name)
-    if not secret:
+    try:
+        secret = kwargs["pushers"].get(name).secret
+    except:
         return _warnOut("Pusher '{}' is not registered.\n".format(name))
-    
+
     # Check if secret is correct:
     sig_calc = hashlib.sha224(
         "{}/{}/".format(secret,"/".join(kwargs["original_path_parts"][2:])).encode('utf-8')).hexdigest()
@@ -117,7 +133,7 @@ def _pushhandler(name, sig, timest, title, text="", *args, **kwargs):
         return _warnOut("Signature error.\n")
 
     # Check if this was signed within the last MAX_DELAY seconds.
-    if (time.time() - int(timest)) > MAX_DELAY:
+    if (timestamp() - int(timest)) > MAX_DELAY:
         return _warnOut("Delay error.\n")
 
     logger.info("Pushing {}: {}.".format(title, text))
@@ -134,7 +150,7 @@ def _pushhandler(name, sig, timest, title, text="", *args, **kwargs):
     notif = json.dumps(notif).encode('utf-8')
     for sub in kwargs["clients"].values():
         webpush(
-            sub,
+            sub.subscription,
             notif,
             vapid_private_key=PATH_PEM,
             vapid_claims={"sub": "mailto:" + ADMIN_EMAIL})

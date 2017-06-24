@@ -120,7 +120,7 @@ function updateSubscriptionOnServer(subscription){
     device_name = getAndUpdateName()
     if (device_name == null)
         return;
-    subscription = JSON.stringify(subscription);
+    subscription = JSON.stringify(subscription).replace(/\//g,"%2F");
     $("content").innerText=subscription;
     get('/register/' + encodeURIComponent(name) + "/" + subscription).then(function(response) {
         response = JSON.parse(response)

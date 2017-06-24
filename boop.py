@@ -4,7 +4,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
-from RegistrationManager import RegistrationManager
+from objects import RegManager
 from config import *
 from endpoints import ALL_ENDPOINTS, ERROR_500
 
@@ -23,8 +23,8 @@ logger = logging.getLogger("boop")
 #
 # Registration Manager
 #
-notifyMan = RegistrationManager(CLIENT_MANAGER, MAX_CLIENTS)
-pusherMan = RegistrationManager(PUSHER_MANAGER, MAX_CLIENTS)
+notifyMan = RegManager(CLIENT_MANAGER, MAX_CLIENTS)
+pusherMan = RegManager(PUSHER_MANAGER, MAX_CLIENTS)
 
 #
 # Handler

@@ -1,6 +1,5 @@
-#
-# Handles user registration.
-#
+# Class Defs
+
 import logging
 import pickle
 from collections import OrderedDict
@@ -8,7 +7,7 @@ from pathlib import Path
 
 logger = logging.getLogger("boop.regman")
 
-class RegistrationManager(object):
+class RegManager(object):
     def __init__(self, regFile, max_clients=20):
         self.fn = Path(regFile)
         self.max_clients = max_clients
@@ -41,5 +40,30 @@ class RegistrationManager(object):
     def values(self):
         return self.clients.values()
 
+    def keys(self):
+        return self.clients.keys()
+
     def __repr__(self):
         return self.clients.__repr__()
+
+
+class Client(object):
+    def __init__(self, name, created, subscription, browser="", machine=""):
+        self.name = name
+        self.created = created
+        self.subscription = subscription
+        self.browser = browser
+        self.machine = machine
+
+    def getData(self):
+        return {k: self.__getattribute__(k) for k in ["name", "created", "browser", "machine"]}
+
+
+class Pusher(object):
+    def __init__(self, name, created, secret):
+        self.name = name
+        self.created = created
+        self.secret = secret
+
+    def getData(self):
+        return {k: self.__getattribute__(k) for k in ["name", "created"]}

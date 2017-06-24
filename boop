@@ -1,5 +1,9 @@
 #!/bin/bash
-
+set -e
 CODEROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+# Generate the private key if it is not already done:
+(cd "$CODEROOT" && vapid --gen)
+
+# Run boop:
 (cd "$CODEROOT" && python3 boop.py)

@@ -3,7 +3,7 @@
 // This is based loosely on the tutorial at:
 // https://developers.google.com/web/fundamentals/getting-started/codelabs/push-notifications/
 
-const PUBLIC_KEY="BKgErtbhIt2ODORN94yWQsX-etN4RwaJc3Z7NTD_litd4Zmu3oIN39tjXHd8bEMt5Fl94r9I6YakfEHtWijS96Y";
+const PUBLIC_KEY="BFZ5YDiXd5laiWSNtNfMo1JF23b0xIP5JfBVFJoIqa7HYZiatLpn-EZuZvRh_9MEGchjj_XmVbFumRFaf8J1iqg";
 
 function $(id) {
     return document.getElementById(id);

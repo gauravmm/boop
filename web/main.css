@@ -121,11 +121,18 @@ header::after{
     color: #FFF;
     cursor: pointer;
 }
-.button-active > .if-notif-enabled {
+.button > .if-notif-enabled, .button > .if-notif-disabled {
     display: none;
 }
-.button-selected > .if-notif-disabled {
-    display: none;
+.button-active > .if-notif-error,
+.button-selected > .if-notif-error {
+    display: none
+}
+.button-selected > .if-notif-enabled {
+    display: inline;
+}
+.button-active > .if-notif-disabled {
+    display: inline;
 }
 
 
@@ -143,6 +150,9 @@ header::after{
     background: #F44763;
     border: thin solid #F44763;
     min-height: 56px;
+}
+.error-hidden {
+    display: none;
 }
 .error span {
     font-weight: bold;

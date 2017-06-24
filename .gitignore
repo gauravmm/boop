@@ -1,5 +1,6 @@
 # Private keys
 *.pem
+applicationServerKey
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

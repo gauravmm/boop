@@ -1,9 +1,12 @@
 import mimetypes
+import logging
 from pathlib import Path
 
 from pywebpush import WebPushException, webpush
 
 from config import *
+
+logger = logging.getLogger("boop.endpoints")
 
 ALL_ENDPOINTS = []
 class EndpointHandler(object):

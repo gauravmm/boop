@@ -4,3 +4,7 @@ from pathlib import Path
 
 SERVER_ADDR = ('', 8000)
 PATH_WEB=Path("web/").resolve()
+PATH_LOG="boop.log"
+
+SERVER_KEY=Path("applicationServerKey").read_text()
+SERVER_URL="boop.narm.me"

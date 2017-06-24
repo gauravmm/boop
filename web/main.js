@@ -3,7 +3,6 @@
 // This is based loosely on the tutorial at:
 // https://developers.google.com/web/fundamentals/getting-started/codelabs/push-notifications/
 
-
 function $(id) {
     return document.getElementById(id);
 }

@@ -40,29 +40,30 @@ def returnJSON(inp):
 def parsePath(nm, vars):
     def decorate(func):
         def func_wrapper(path, **kwargs):
-            path_parts = path.split("/", len(vars))
+            path_parts = path.split("/", len(vars) + 1)
             assert path_parts[0] == ""
-            path_parts.pop(0)
-            if len(path_parts) == len(vars) + 1:
-                logger.warn(path_parts)
+            assert path_parts[1] == nm
+            path_parts = [urllib.parse.unquote_plus(p) for p in path_parts[2:]]
+
+            if len(path_parts) == len(vars):
                 return func(*path_parts, **kwargs)
             else:
                 return returnJSON({
                     "success": False,
-                    "message": "Incorrect format. We expect {}/{}/{}".format(SERVER_URL, nm, "/".join("<" + v + ">" for v in vars))
+                    "message": "Incorrect format. We expect {}/{}/{}".format(SERVER_URL, nm, "/".join("&lt;"+v+"&gt;" for v in vars))
                 })
         return func_wrapper
     return decorate 
 
 
 #
-# /register/<name>/<id>
+# /register/<name>/<subscription>
 #
-@parsePath("register", ["name", "querystring"])
-def _reghandler(name, qs, **kwargs):
-    # Get the name from the path:
-    logger.info("Registering {} with querystring {}.".format(name, qs))
-    message = kwargs["clients"].put(name, qs)
+@parsePath("register", ["name", "sub"])
+def _reghandler(name, sub, **kwargs):
+    sub = json.loads(sub)
+    logger.info("Registering {} with subscription {}.".format(name, sub))
+    message = kwargs["clients"].put(name, sub)
     success = not message
 
     return returnJSON({"success": success, "message": message})
@@ -74,9 +75,6 @@ ALL_ENDPOINTS.append(EndpointHandler("RegistrationHandler", "/register/", _regha
 #
 @parsePath("addpusher", ["name"])
 def _addpusherhandler(name, **kwargs):
-    # Get the name from the path:
-    auth="???"
-    name = path_parts[1]
     auth = str(uuid.uuid4())
     logger.info("Adding Pusher {} with auth {}.".format(name, auth))
     message = kwargs["pushers"].put(name, auth)
@@ -91,13 +89,26 @@ ALL_ENDPOINTS.append(EndpointHandler("AddPusherHandler", "/addpusher/", _addpush
 #
 @parsePath("push", ["pusher_name", "sig", "title", "text"])
 def _pushhandler(name, sig, title, text, **kwargs):
-    logger.info("Pushing {}.".format(name))
-    auth="???"
+    logger.info("Pushing {}: {}.".format(title, text))
+    message = ""
 
-    message = kwargs["pushers"].put(name, auth)
+    notif = {
+        "title": title,
+        "body": text,
+        "url": SERVER_URL,
+        "badge": "icons/bell.png",
+        "icon": "icons/bell-solid.png"
+    }
+
+    notif = json.dumps(notif).encode('utf-8')
+    for sub in kwargs["clients"].values():
+        webpush(
+            sub,
+            notif,
+            vapid_private_key=PATH_PEM,
+            vapid_claims={"sub": "mailto:" + ADMIN_EMAIL})
+
     success = not message
-    
-    # Handle the generation of config.js
     return returnJSON({"success": success, "message": message})
 ALL_ENDPOINTS.append(EndpointHandler("PushHandler", "/push/", _pushhandler))
 

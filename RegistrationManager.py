@@ -37,3 +37,6 @@ class RegistrationManager(object):
             return self.clients[name]
         except:
             return None
+
+    def values(self):
+        return self.clients.values()

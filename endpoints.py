@@ -33,7 +33,7 @@ ERROR_500 = EndpointHandler("500Error", "", error("500"))
 ERROR_404 = EndpointHandler("404Error", "", error("404"))
 
 def returnJSON(inp):
-    rv = "HTTP/1.x 200 OK\nContent-Type: application/javascript\n\n"
+    rv = "HTTP/1.1 200 OK\nContent-Type: application/javascript\n\n"
     rv += json.dumps(inp)
     return rv.encode('utf-8')
 

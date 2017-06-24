@@ -31,12 +31,26 @@
             <span class="if-notif-enabled">Disable Notifications On This Device</span>
             <span class="if-notif-disabled">Enable Notifications On This Device</span>
         </button>
-        <div id="notif-enable-err" class="error-hidden">
+        <div id="notif-enable-err" class="hidden">
             <img src="alerticon.svg" class="alert" alt="!"/>
             <div class="error-msg">
                 <span>Error!</span>
                 <p id="notif-enable-err-msg">Unknown error occurred.</p>
             </div>
+        </div>
+        <div id="newpusher">
+            <h3>Auth Code</h3>
+            <pre id="newpusher-auth" class="code">echo "" > ~/.boop && chmod 0600 ~/.boop;</pre>
+            <h3>.bashrc</h3>
+<pre class="code">
+function boop {
+        local title=$(echo -ne "$1" | xxd -plain | tr -d '\n' | sed 's/\(..\)/%\1/g')
+        local text=$(echo -ne "$2" | xxd -plain | tr -d '\n' | sed 's/\(..\)/%\1/g')
+        local secret=$(cat ~/.boop)
+        local sig=$(echo -ne "$secret:$title:$text" | sha224sum | cut -d" " -f1)
+        wget -qO - "<url>/push/<name>/$sig/$title/$text/$args" 1>/dev/null
+}
+</pre>
         </div>
     </div></div>
     <div id="content">

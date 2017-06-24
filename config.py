@@ -8,3 +8,6 @@ PATH_LOG="boop.log"
 
 SERVER_KEY=Path("applicationServerKey").read_text().strip()
 SERVER_URL="boop.narm.me"
+
+REGISTRATION_FILE="clients.pickle"
+MAX_CLIENTS=20

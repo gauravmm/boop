@@ -3,7 +3,6 @@
 // This is based loosely on the tutorial at:
 // https://developers.google.com/web/fundamentals/getting-started/codelabs/push-notifications/
 
-const PUBLIC_KEY="BFZ5YDiXd5laiWSNtNfMo1JF23b0xIP5JfBVFJoIqa7HYZiatLpn-EZuZvRh_9MEGchjj_XmVbFumRFaf8J1iqg";
 
 function $(id) {
     return document.getElementById(id);
@@ -82,7 +81,7 @@ function initializeUI() {
 }
 
 function subscribeUser() {
-    const applicationServerKey = urlB64ToUint8Array(PUBLIC_KEY);
+    const applicationServerKey = urlB64ToUint8Array(CONFIG.server_key);
     swRegistration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: applicationServerKey
@@ -126,9 +125,13 @@ function updateSubscriptionOnServer(subscription){
     device_name = getAndUpdateName()
     if (device_name == null)
         return;
-    $("content").innerText=JSON.stringify(subscription);
-    get('/register/' + encodeURIComponent(name) + "/").then(function(response) {
-        console.log("Success!", response);
+    subscription = JSON.stringify(subscription);
+    $("content").innerText=subscription;
+    get('/register/' + encodeURIComponent(name) + "/" + subscription).then(function(response) {
+        response = JSON.parse(response)
+        console.log("Response: ", response);
+        if(!response.success)
+            handleSetupError(response.message);
     }).catch(handleSetupError);
 }
 

@@ -1,5 +1,7 @@
-import mimetypes
+import json
 import logging
+import mimetypes
+import urllib
 from pathlib import Path
 
 from pywebpush import WebPushException, webpush
@@ -18,18 +20,60 @@ class EndpointHandler(object):
     def canRun(self, path):
         return path.startswith(self.endpt)
 
-    def run(self, path, wfile):
-        wfile.write(self.func(path))
+    def run(self, path, wfile, **kwargs):
+        wfile.write(self.func(path, **kwargs))
 
 def error(errorid):
     if errorid not in ["404", "500"]:
         errorid = "500"
-    return lambda _: (PATH_WEB / ("error_" + errorid)).read_bytes()
+    return lambda _, **__: (PATH_WEB / ("error_" + errorid)).read_bytes()
 
 ERROR_500 = EndpointHandler("500Error", "", error("500"))
 ERROR_404 = EndpointHandler("404Error", "", error("404"))
 
-def _filehandler(path):
+
+#
+# /register/<name>/<id>
+#
+def _reghandler(path, **kwargs):
+    # Get the name from the path:
+    path_parts = path.split("/", 3)
+    name = path_parts[2]
+    qs = urllib.parse.unquote_plus(path_parts[3])
+    message = ""
+
+    logger.info("Registering {} with querystring {}.".format(name, qs))
+    message = kwargs["regMan"].setClient(name, qs)
+    if message:
+        success = False
+
+    # Handle the generation of config.js
+    rv = "HTTP/1.x 200 OK\nContent-Type: application/javascript\n\n"
+    rv += json.dumps({ "success": success, "message": message })
+    return rv.encode('utf-8')
+ALL_ENDPOINTS.append(EndpointHandler("RegistrationHandler", "/register/", _reghandler))
+
+
+#
+# /config.js
+#
+def _confighandler(path, **kwargs):
+    # Handle the generation of config.js
+    rv = "HTTP/1.x 200 OK\n"
+    rv += "Content-Type: application/javascript\n"
+    rv += "\n"
+    rv += "const CONFIG = " + json.dumps({
+        "server_key": SERVER_KEY,
+        "url": SERVER_URL
+    })
+    return rv.encode('utf-8')
+ALL_ENDPOINTS.append(EndpointHandler("ConfigHandler", "/config.js", _confighandler))
+
+
+#
+# /**
+#
+def _filehandler(path, **kwargs):
     # Any errors raised are returned as HTTP/500 automatically.
     qpos = path.find("?")
     if qpos >= 0:

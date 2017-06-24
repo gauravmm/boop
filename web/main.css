@@ -36,8 +36,8 @@ body {
     }
 }
 
-/* Header */
 
+/* Header */
 header {
     display: block;
     background: rgb(80,156,240);
@@ -89,8 +89,8 @@ header::after{
     clear: both;
 }
 
-/* Buttons */
 
+/* Buttons */
 .button {
     position: relative;
     width: 100%;
@@ -138,7 +138,6 @@ header::after{
 .button-error > .if-notif-error {
     display: inline;
 }
-
 
 
 /* Error handling */

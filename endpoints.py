@@ -16,7 +16,7 @@ logger = logging.getLogger("boop.endpoints")
 
 ALL_ENDPOINTS = []
 
-lambda timestamp: int(time.time())
+timestamp = lambda: int(time.time())
 
 class EndpointHandler(object):
     def __init__(self, name, endpt, func):
@@ -86,6 +86,20 @@ ALL_ENDPOINTS.append(EndpointHandler("RegistrationHandler", "/register/", _regha
 
 
 #
+# /touch/<name>
+#
+@parsePath("touch", ["name"])
+def _touchhandler(name, **kwargs):
+    logger.debug("Touch {}.".format(name))
+    try:
+        kwargs["clients"].touch(name, timestamp())
+    except Exception as e:
+        logger.exception(e)
+    return returnJSON({"success": True, "message": ""})
+ALL_ENDPOINTS.append(EndpointHandler("AcknowledgementHandler", "/touch/", _touchhandler))
+
+
+#
 # /addpusher/name/
 #
 @parsePath("addpusher", ["name"])
@@ -133,10 +147,13 @@ def _pushhandler(name, sig, timest, title, text="", *args, **kwargs):
         return _warnOut("Signature error.\n")
 
     # Check if this was signed within the last MAX_DELAY seconds.
-    if (timestamp() - int(timest)) > MAX_DELAY:
+    now = timestamp()
+    if (now - int(timest)) > MAX_DELAY:
         return _warnOut("Delay error.\n")
 
     logger.info("Pushing {}: {}.".format(title, text))
+
+    kwargs["pushers"].touch(name, now)
 
     notif = {
         "title": title,
@@ -147,11 +164,11 @@ def _pushhandler(name, sig, timest, title, text="", *args, **kwargs):
         "args": args
     }
 
-    notif = json.dumps(notif).encode('utf-8')
     for sub in kwargs["clients"].values():
+        notif["acknowledge_url"] = "{}touch/{}/".format(SERVER_URL, sub.name)
         webpush(
             sub.subscription,
-            notif,
+            json.dumps(notif).encode('utf-8'),
             vapid_private_key=PATH_PEM,
             vapid_claims={"sub": "mailto:" + ADMIN_EMAIL})
 

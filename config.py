@@ -8,7 +8,8 @@ PATH_LOG="boop.log"
 PATH_PEM="private_key.pem"
 
 SERVER_KEY=Path("applicationServerKey").read_text().strip()
-SERVER_URL="https://boop.narm.me/"
+#SERVER_URL="https://boop.narm.me/"
+SERVER_URL="http://127.0.0.1:8000/"
 ADMIN_EMAIL="gaurav@gauravmanek.com"
 
 CLIENT_MANAGER="clients.pickle"

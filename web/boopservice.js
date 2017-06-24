@@ -9,10 +9,13 @@ self.addEventListener('notificationclick', function(event) {
 
 self.addEventListener('push', function(event) {
     console.log(`Push data: "${event.data.text()}"`);
-    options = JSON.parse(event.data.text())
+    options = event.data.json()
     const title = options.title;
     options.requireInteraction = false;
     options.data = options
 
     event.waitUntil(self.registration.showNotification(title, options));
+    console.log(event)
+    if (options.acknowledge_url)
+        event.waitUntil(fetch(options.acknowledge_url))
 });

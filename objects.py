@@ -31,6 +31,11 @@ class RegManager(object):
         self.fn.write_bytes(pickle.dumps(self.clients))
         return None
 
+    def touch(self, name, timestamp):
+        v = self.get(name)
+        if v:
+            v.lastseen = timestamp
+
     def get(self, name):
         try:
             return self.clients[name]
@@ -51,19 +56,21 @@ class Client(object):
     def __init__(self, name, created, subscription, browser="", machine=""):
         self.name = name
         self.created = created
+        self.lastseen = created
         self.subscription = subscription
         self.browser = browser
         self.machine = machine
 
     def getData(self):
-        return {k: self.__getattribute__(k) for k in ["name", "created", "browser", "machine"]}
+        return {k: self.__getattribute__(k) for k in ["name", "created", "lastseen", "browser", "machine"]}
 
 
 class Pusher(object):
     def __init__(self, name, created, secret):
         self.name = name
         self.created = created
+        self.lastseen = created
         self.secret = secret
 
     def getData(self):
-        return {k: self.__getattribute__(k) for k in ["name", "created"]}
+        return {k: self.__getattribute__(k) for k in ["name", "lastseen", "created"]}

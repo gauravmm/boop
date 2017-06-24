@@ -2,6 +2,7 @@ import json
 import logging
 import mimetypes
 import urllib
+import uuid
 from pathlib import Path
 
 from pywebpush import WebPushException, webpush
@@ -31,26 +32,74 @@ def error(errorid):
 ERROR_500 = EndpointHandler("500Error", "", error("500"))
 ERROR_404 = EndpointHandler("404Error", "", error("404"))
 
+def returnJSON(inp):
+    rv = "HTTP/1.x 200 OK\nContent-Type: application/javascript\n\n"
+    rv += json.dumps(inp)
+    return rv.encode('utf-8')
+
+def parsePath(nm, vars):
+    def decorate(func):
+        def func_wrapper(path, **kwargs):
+            path_parts = path.split("/", len(vars))
+            assert path_parts[0] == ""
+            path_parts.pop(0)
+            if len(path_parts) == len(vars) + 1:
+                logger.warn(path_parts)
+                return func(*path_parts, **kwargs)
+            else:
+                return returnJSON({
+                    "success": False,
+                    "message": "Incorrect format. We expect {}/{}/{}".format(SERVER_URL, nm, "/".join("<" + v + ">" for v in vars))
+                })
+        return func_wrapper
+    return decorate 
+
 
 #
 # /register/<name>/<id>
 #
-def _reghandler(path, **kwargs):
+@parsePath("register", ["name", "querystring"])
+def _reghandler(name, qs, **kwargs):
     # Get the name from the path:
-    path_parts = path.split("/", 3)
-    name = path_parts[2]
-    qs = urllib.parse.unquote_plus(path_parts[3])
-    message = ""
-
     logger.info("Registering {} with querystring {}.".format(name, qs))
-    message = kwargs["regMan"].setClient(name, qs)
+    message = kwargs["clients"].put(name, qs)
     success = not message
 
-    # Handle the generation of config.js
-    rv = "HTTP/1.x 200 OK\nContent-Type: application/javascript\n\n"
-    rv += json.dumps({ "success": success, "message": message })
-    return rv.encode('utf-8')
+    return returnJSON({"success": success, "message": message})
 ALL_ENDPOINTS.append(EndpointHandler("RegistrationHandler", "/register/", _reghandler))
+
+
+#
+# /addpusher/name/
+#
+@parsePath("addpusher", ["name"])
+def _addpusherhandler(name, **kwargs):
+    # Get the name from the path:
+    auth="???"
+    name = path_parts[1]
+    auth = str(uuid.uuid4())
+    logger.info("Adding Pusher {} with auth {}.".format(name, auth))
+    message = kwargs["pushers"].put(name, auth)
+    success = not message
+
+    return returnJSON({"success": success, "message": message, "auth": auth})
+ALL_ENDPOINTS.append(EndpointHandler("AddPusherHandler", "/addpusher/", _addpusherhandler))
+
+
+#
+# /push/name/sig/title/text
+#
+@parsePath("push", ["pusher_name", "sig", "title", "text"])
+def _pushhandler(name, sig, title, text, **kwargs):
+    logger.info("Pushing {}.".format(name))
+    auth="???"
+
+    message = kwargs["pushers"].put(name, auth)
+    success = not message
+    
+    # Handle the generation of config.js
+    return returnJSON({"success": success, "message": message})
+ALL_ENDPOINTS.append(EndpointHandler("PushHandler", "/push/", _pushhandler))
 
 
 #

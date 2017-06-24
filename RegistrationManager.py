@@ -19,7 +19,7 @@ class RegistrationManager(object):
             logger.warn("Client database does not exist or cannot be read. Starting with empty database.")
             self.clients = {}
 
-    def setClient(self, name, val):
+    def put(self, name, val):
         if not val:
             if name in self.clients:
                 del self.clients[name]
@@ -31,3 +31,9 @@ class RegistrationManager(object):
             self.clients[name] = val
         self.fn.write_bytes(pickle.dumps(self.clients))
         return None
+
+    def get(self, name):
+        try:
+            return self.clients[name]
+        except:
+            return None

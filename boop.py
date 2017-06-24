@@ -23,7 +23,8 @@ logger = logging.getLogger("boop")
 #
 # Registration Manager
 #
-registrationManager = RegistrationManager(REGISTRATION_FILE, MAX_CLIENTS)
+notifyMan = RegistrationManager(CLIENT_MANAGER, MAX_CLIENTS)
+pusherMan = RegistrationManager(PUSHER_MANAGER, MAX_CLIENTS)
 
 #
 # Handler
@@ -33,7 +34,8 @@ class BoopHTTPHandler(http.server.BaseHTTPRequestHandler):
         kwargs = {
             "rfile": self.rfile,
             "headers": self.headers,
-            "regMan": registrationManager
+            "clients": notifyMan,
+            "pushers": pusherMan,
         }
         try:
             for endpt in ALL_ENDPOINTS:

@@ -122,11 +122,10 @@ function updateSubscriptionOnServer(subscription){
         return;
     subscription = JSON.stringify(subscription).replace(/\//g,"%2F");
     $("content").innerText=subscription;
-    get('/register/' + encodeURIComponent(name) + "/" + subscription).then(function(response) {
-        response = JSON.parse(response)
+    fetch('/register/' + encodeURIComponent(name) + "/" + subscription).then((r)=>r.json()).then(function(response) {
         console.log("Response: ", response);
         if(!response.success)
-            handleSetupError(response.message);
+            return Promise.reject(response.message);
     }).catch(handleSetupError);
 }
 
@@ -140,8 +139,7 @@ $("pusher-new").onclick = function() {
         $("pusher-new").className = "button button-active";
         return;
     }
-    get('/addpusher/' + encodeURIComponent(device_name) + "/").then(function(response) {
-        var response = JSON.parse(response)
+    fetch('/addpusher/' + encodeURIComponent(device_name) + "/").then((r)=>r.json()).then(function(response) {
         console.log("Pusher-new: ", response);
         if(!response.success)
             return Promise.reject(response.message);
@@ -158,21 +156,4 @@ function boop {
 }`;
         $("newpusher").className=""
     }).catch(handleSetupError);
-}
-
-
-// Promisified-XMLHttpRequest from:
-// https://developers.google.com/web/fundamentals/getting-started/primers/promises#promisifying_xmlhttprequest
-function get(url) {
-    return new Promise(function(resolve, reject) {
-        var req = new XMLHttpRequest();
-        req.open('GET', url);
-        req.onload = function() {
-            if (req.status == 200)
-                resolve(req.response);
-            reject(Error("Cannot register with server: " + req.statusText));
-        };
-        req.onerror = () => reject(Error("Cannot register with server: Network Error"));
-        req.send();
-    });
 }

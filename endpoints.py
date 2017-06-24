@@ -40,13 +40,20 @@ def returnJSON(inp):
 def parsePath(nm, vars):
     def decorate(func):
         def func_wrapper(path, **kwargs):
-            path_parts = path.split("/", len(vars) + 1)
+            path_parts = path.split("/", 99)
             assert path_parts[0] == ""
             assert path_parts[1] == nm
             path_parts = [urllib.parse.unquote_plus(p) for p in path_parts[2:]]
 
-            if len(path_parts) == len(vars):
-                return func(*path_parts, **kwargs)
+            args = []
+            nargs = len(path_parts)
+            if vars[-1] == "*":
+                nargs -= 1
+                args=path_parts[nargs:]
+                path_parts=path_parts[:nargs]
+
+            if len(path_parts) >= nargs:
+                return func(*path_parts, *args, **kwargs)
             else:
                 return returnJSON({
                     "success": False,
@@ -85,10 +92,10 @@ ALL_ENDPOINTS.append(EndpointHandler("AddPusherHandler", "/addpusher/", _addpush
 
 
 #
-# /push/name/sig/title/text
+# /push/name/sig/title/text/[args/]*
 #
-@parsePath("push", ["pusher_name", "sig", "title", "text"])
-def _pushhandler(name, sig, title, text, **kwargs):
+@parsePath("push", ["pusher_name", "sig", "title", "text", "*"])
+def _pushhandler(name, sig, title, text, *args, **kwargs):
     logger.info("Pushing {}: {}.".format(title, text))
     message = ""
 
@@ -97,7 +104,8 @@ def _pushhandler(name, sig, title, text, **kwargs):
         "body": text,
         "url": SERVER_URL,
         "badge": "icons/bell.png",
-        "icon": "icons/bell-solid.png"
+        "icon": "icons/bell-solid.png",
+        "args": args
     }
 
     notif = json.dumps(notif).encode('utf-8')

@@ -103,12 +103,12 @@ header::after{
     cursor: not-allowed;
     text-transform: uppercase;
     font-weight: bold;
-    box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.3);
 }
 .button-active:hover, .button-selected {
     top: 2px;
     left: 2px;
-    box-shadow: 1px 1px 3px 0px rgba(0,0,0,0.3);
+    box-shadow: 0 1px 3px 0px rgba(0,0,0,0.3);
 }
 .button-active {
     background: #B1499E;

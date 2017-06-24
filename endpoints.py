@@ -44,8 +44,7 @@ def _reghandler(path, **kwargs):
 
     logger.info("Registering {} with querystring {}.".format(name, qs))
     message = kwargs["regMan"].setClient(name, qs)
-    if message:
-        success = False
+    success = not message
 
     # Handle the generation of config.js
     rv = "HTTP/1.x 200 OK\nContent-Type: application/javascript\n\n"

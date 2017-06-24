@@ -86,8 +86,6 @@ function subscribeUser() {
         userVisibleOnly: true,
         applicationServerKey: applicationServerKey
     }).then(function(subscription) {
-        console.log('User is subscribed.');
-        console.log(subscription);
         updateSubscriptionOnServer(subscription);
         isSubscribed = true;
         updateButton();
@@ -96,16 +94,12 @@ function subscribeUser() {
 function unsubscribeUser() {
     swRegistration.pushManager.getSubscription()
     .then(function(subscription) {
-        if (subscription) {
-          return subscription.unsubscribe();
-        }
-    }).catch(handleSetupError)
-    .then(function() {
+        return subscription && subscription.unsubscribe()
+    }).then(function() {
         updateSubscriptionOnServer(null);
-        console.log('User is unsubscribed.');
         isSubscribed = false;
         updateButton();
-    });
+    }).catch(handleSetupError);
 }
 
 var device_name = localStorage.getItem("name");

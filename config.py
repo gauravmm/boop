@@ -14,3 +14,4 @@ ADMIN_EMAIL="gaurav@gauravmanek.com"
 CLIENT_MANAGER="clients.pickle"
 PUSHER_MANAGER="pushers.pickle"
 MAX_CLIENTS=20
+MAX_DELAY=60

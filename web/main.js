@@ -149,7 +149,7 @@ $("pusher-new").onclick = function() {
         $("newpusher-bashrc").innerText=`# Add this to your .bashrc or startup script
 # Usage: boop &lt;title&gt; &lt;text&gt; [&lt;option-1&gt; [...]]
 function boop {
-    local pushstr=""
+    local pushstr="$(date +%s)/"
     for arg in "$@"; do
         pushstr="$pushstr$(echo -ne $arg | xxd -plain | tr -d '\\n' | sed 's/\\(..\\)/%\\1/g')/"
     done

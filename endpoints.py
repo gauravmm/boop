@@ -2,6 +2,7 @@ import hashlib
 import json
 import logging
 import mimetypes
+import time
 import urllib
 import uuid
 from pathlib import Path
@@ -98,20 +99,28 @@ ALL_ENDPOINTS.append(EndpointHandler("AddPusherHandler", "/addpusher/", _addpush
 #
 # /push/name/sig/title/text/[args/]*
 #
-@parsePath("push", ["pusher_name", "sig", "title", "text", "*"])
-def _pushhandler(name, sig, title, text="", *args, **kwargs):
-    logger.info("Pushing {}: {}.".format(title, text))
+def _warnOut(s):
+    logger.warn(s)
+    return returnStr(s)
 
+@parsePath("push", ["pusher_name", "sig", "timestamp", "title", "text", "*"])
+def _pushhandler(name, sig, timest, title, text="", *args, **kwargs):
     # Look up name to get secret
     secret = kwargs["pushers"].get(name)
     if not secret:
-        return returnStr("Pusher '{}' is not registered.\n")
+        return _warnOut("Pusher '{}' is not registered.\n".format(name))
     
     # Check if secret is correct:
     sig_calc = hashlib.sha224(
         "{}/{}/".format(secret,"/".join(kwargs["original_path_parts"][2:])).encode('utf-8')).hexdigest()
     if sig_calc != sig:
-        return returnStr("Signature error.\n")
+        return _warnOut("Signature error.\n")
+
+    # Check if this was signed within the last MAX_DELAY seconds.
+    if (time.time() - int(timest)) > MAX_DELAY:
+        return _warnOut("Delay error.\n")
+
+    logger.info("Pushing {}: {}.".format(title, text))
 
     notif = {
         "title": title,

@@ -33,10 +33,10 @@ def error(errorid):
 ERROR_500 = EndpointHandler("500Error", "", error("500"))
 ERROR_404 = EndpointHandler("404Error", "", error("404"))
 
+def returnStr(inp):
+    return ("HTTP/1.1 200 OK\nContent-Type: application/javascript\n\n" + inp).encode('utf-8')
 def returnJSON(inp):
-    rv = "HTTP/1.1 200 OK\nContent-Type: application/javascript\n\n"
-    rv += json.dumps(inp)
-    return rv.encode('utf-8')
+    return returnStr(json.dumps(inp))
 
 def parsePath(nm, vars):
     def decorate(func):
@@ -102,16 +102,16 @@ ALL_ENDPOINTS.append(EndpointHandler("AddPusherHandler", "/addpusher/", _addpush
 def _pushhandler(name, sig, title, text="", *args, **kwargs):
     logger.info("Pushing {}: {}.".format(title, text))
 
-    logger.warn(kwargs["original_path_parts"])
     # Look up name to get secret
     secret = kwargs["pushers"].get(name)
     if not secret:
-        return "Pusher '{}' is not registered.\n"
+        return returnStr("Pusher '{}' is not registered.\n")
+    
     # Check if secret is correct:
     sig_calc = hashlib.sha224(
         "{}/{}/".format(secret,"/".join(kwargs["original_path_parts"][2:])).encode('utf-8')).hexdigest()
     if sig_calc != sig:
-        return "Signature error.\n"
+        return returnStr("Signature error.\n")
 
     notif = {
         "title": title,
@@ -130,7 +130,7 @@ def _pushhandler(name, sig, title, text="", *args, **kwargs):
             vapid_private_key=PATH_PEM,
             vapid_claims={"sub": "mailto:" + ADMIN_EMAIL})
 
-    return ""
+    return returnStr("")
 ALL_ENDPOINTS.append(EndpointHandler("PushHandler", "/push/", _pushhandler))
 
 

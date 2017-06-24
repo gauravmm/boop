@@ -1,5 +1,6 @@
 # Private keys
 *.pem
+*.log.*
 applicationServerKey
 
 # Byte-compiled / optimized / DLL files

@@ -24,12 +24,14 @@ function urlB64ToUint8Array(base64String) {
   return outputArray;
 }
 
-function handleSetupError(error){
+function handleSetupError(error, recoverable=false){
     console.error('Setup Error', error);
-    $("notif-enable").className = "button button-error";
-    $("notif-enable").disabled = true;
     $("notif-enable-err").className = "error";
     $("notif-enable-err-msg").innerHTML = error;
+    if(recoverable)
+        return
+    $("notif-enable").className = "button button-error";
+    $("notif-enable").disabled = true;
 }
 
 var swRegistration = null;
@@ -107,7 +109,41 @@ function unsubscribeUser() {
     });
 }
 
-function updateSubscriptionOnServer(subscription){
-    $("content").innerText=JSON.stringify(subscription);
+var device_name = localStorage.getItem("name");
+function getAndUpdateName(force=false){
+    if (device_name == null || device_name == "" || force) {
+        device_name = window.prompt("Please assign this device a name:", navigator.appName);
+        if (device_name == null || device_name == "") {
+            handleSetupError("Please specify a name for this device.", True);
+            return null;
+        }
+        localStorage.setItem("name", device_name);
+    }
+    return device_name;
 }
 
+function updateSubscriptionOnServer(subscription){
+    device_name = getAndUpdateName()
+    if (device_name == null)
+        return;
+    $("content").innerText=JSON.stringify(subscription);
+    get('/register/' + encodeURIComponent(name) + "/").then(function(response) {
+        console.log("Success!", response);
+    }).catch(handleSetupError);
+}
+
+// Promisified-XMLHttpRequest from:
+// https://developers.google.com/web/fundamentals/getting-started/primers/promises#promisifying_xmlhttprequest
+function get(url) {
+    return new Promise(function(resolve, reject) {
+        var req = new XMLHttpRequest();
+        req.open('GET', url);
+        req.onload = function() {
+            if (req.status == 200)
+                resolve(req.response);
+            reject(Error("Cannot register with server: " + req.statusText));
+        };
+        req.onerror = () => reject(Error("Cannot register with server: Network Error"));
+        req.send();
+    });
+}

@@ -40,9 +40,12 @@ def returnJSON(inp):
 def parsePath(nm, vars):
     def decorate(func):
         def func_wrapper(path, **kwargs):
-            path_parts = path.split("/", 99)
+            path_parts = [p.strip() for p in path.split("/", 99)]
             assert path_parts[0] == ""
             assert path_parts[1] == nm
+            if path_parts[-1] == "":
+                path_parts.pop()
+            logger.warn(path_parts)
             path_parts = [urllib.parse.unquote_plus(p) for p in path_parts[2:]]
 
             args = []
@@ -95,7 +98,7 @@ ALL_ENDPOINTS.append(EndpointHandler("AddPusherHandler", "/addpusher/", _addpush
 # /push/name/sig/title/text/[args/]*
 #
 @parsePath("push", ["pusher_name", "sig", "title", "text", "*"])
-def _pushhandler(name, sig, title, text, *args, **kwargs):
+def _pushhandler(name, sig, title, text="", *args, **kwargs):
     logger.info("Pushing {}: {}.".format(title, text))
     message = ""
 

@@ -75,6 +75,8 @@ function initializeUI() {
             }
             updateButton();
         }
+        $("pusher-new").disabled = false;
+        $("pusher-new").className = "button button-active";
         updateButton();
     }).catch(handleSetupError);
 }
@@ -127,6 +129,37 @@ function updateSubscriptionOnServer(subscription){
             handleSetupError(response.message);
     }).catch(handleSetupError);
 }
+
+// Add new client
+$("pusher-new").onclick = function() {
+    $("pusher-new").disabled = true;
+    $("pusher-new").className = "button button-processing";
+    device_name = getAndUpdateName()
+    if (device_name == null) {
+        $("pusher-new").disabled = false;
+        $("pusher-new").className = "button button-active";
+        return;
+    }
+    get('/addpusher/' + encodeURIComponent(device_name) + "/").then(function(response) {
+        var response = JSON.parse(response)
+        console.log("Pusher-new: ", response);
+        if(!response.success)
+            return Promise.reject(response.message);
+        $("newpusher-auth").innerText=`echo '${response.auth}' > ~/.boop && chmod 0600 ~/.boop;`;
+        $("newpusher-bashrc").innerText=`# Add this to your .bashrc or startup script
+# Usage: boop &lt;title&gt; &lt;text&gt; [&lt;option-1&gt; [...]]
+function boop {
+    local pushstr=""
+    for arg in "$@"; do
+        pushstr="$pushstr$(echo -ne $arg | xxd -plain | tr -d '\\n' | sed 's/\\(..\\)/%\\1/g')/"
+    done
+    local sig=$(echo -ne "$(cat ~/.boop)/$pushstr" | sha224sum | cut -d" " -f1)
+    wget -qO - "${CONFIG.url}push/${device_name}/$sig/$pushstr" 1>/dev/null
+}`;
+        $("newpusher").className=""
+    }).catch(handleSetupError);
+}
+
 
 // Promisified-XMLHttpRequest from:
 // https://developers.google.com/web/fundamentals/getting-started/primers/promises#promisifying_xmlhttprequest

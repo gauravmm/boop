@@ -92,28 +92,40 @@ header::after{
 /* Buttons */
 
 .button {
+    position: relative;
     width: 100%;
-    height: 28px;
-    line-height: 28px;
+    height: 36px;
+    line-height: 36px;
     margin: 0 0 8px 0;
-    border: thin solid #999;
-    color: #666;
+    color: #FFF;
+    background: #DDD;
+    border: none;
     text-align: center;
     cursor: not-allowed;
+    text-transform: uppercase;
+    font-weight: bold;
+    box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.3);
 }
-
+.button-active:hover, .button-selected {
+    top: 2px;
+    left: 2px;
+    box-shadow: 1px 1px 3px 0px rgba(0,0,0,0.3);
+}
 .button-active {
-    border: thin solid #666;
-    background: #CEC0FB;
-    color: #000;
-    cursor: pointer;
-}
-
-.button-selected {
-    border: thin solid #666;
     background: #B1499E;
     color: #FFF;
     cursor: pointer;
+}
+.button-selected {
+    background: #3BB603;
+    color: #FFF;
+    cursor: pointer;
+}
+.button-active > .if-notif-enabled {
+    display: none;
+}
+.button-selected > .if-notif-disabled {
+    display: none;
 }
 
 

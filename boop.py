@@ -1,20 +1,22 @@
 #!python3
 import http.server
 from pathlib import Path
+
+from config import *
 from endpoints import ALL_ENDPOINTS, ERROR_500
 
-SERVER_ADDR = ('', 8000)
-PATH_WEB=Path("web/")
 
 class BoopHTTPHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
-        # print(self.requestline)
         try:
             for endpt in ALL_ENDPOINTS:
                 if endpt.canRun(self.path):
-                    return endpt.run(path, self.wfile)
-        except:
-            ERROR_500.run(path, self.wfile)
+                    print("Serving {} with {}".format(self.path, endpt.name))
+                    return endpt.run(self.path, self.wfile)
+        except Exception as e:
+            print(e)
+            ERROR_500.run(self.path, self.wfile)
+            raise
         print(self.path)
 
 def run():

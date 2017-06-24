@@ -5,7 +5,7 @@ import pickle
 from collections import OrderedDict
 from pathlib import Path
 
-from config import STYLE_COLOR, STYLE_IMAGE
+from config import STYLE_COLOR, STYLE_IMAGE, STYLE_CLASS
 
 logger = logging.getLogger("boop.regman")
 
@@ -82,7 +82,8 @@ class StyleManager(object):
         idx = idx % len(STYLE_IMAGE)
         return {
             "icon": STYLE_IMAGE[idx],
-            "color": STYLE_COLOR[idx]
+            "color": STYLE_COLOR[idx],
+            "class": STYLE_CLASS[idx]
         }
 
     def anull(self, obj):

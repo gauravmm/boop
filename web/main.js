@@ -103,7 +103,11 @@ function populateList(node, list) {
 
     list.forEach(function(e) {
         var root = document.createElement("li");
-        
+
+        var icon = document.createElement("img");
+        icon.src = e.style.icon;
+        root.appendChild(icon);
+
         var del = document.createElement("span");
         del.innerText = "X";
         del.className = "d-x"
@@ -112,7 +116,7 @@ function populateList(node, list) {
 
         var name = document.createElement("span");
         name.innerText = e.name;
-        name.className = "d-name"
+        name.className = "d-name " + e.style.class
         root.appendChild(name);
 
         var since = document.createElement("span");

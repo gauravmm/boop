@@ -1,3 +1,4 @@
+import hashlib
 import json
 import logging
 import mimetypes
@@ -40,12 +41,12 @@ def returnJSON(inp):
 def parsePath(nm, vars):
     def decorate(func):
         def func_wrapper(path, **kwargs):
-            path_parts = [p.strip() for p in path.split("/", 99)]
+            path_parts = path.split("/", 99)
             assert path_parts[0] == ""
             assert path_parts[1] == nm
             if path_parts[-1] == "":
                 path_parts.pop()
-            logger.warn(path_parts)
+            kwargs["original_path_parts"]=path_parts[2:]
             path_parts = [urllib.parse.unquote_plus(p) for p in path_parts[2:]]
 
             args = []
@@ -100,7 +101,17 @@ ALL_ENDPOINTS.append(EndpointHandler("AddPusherHandler", "/addpusher/", _addpush
 @parsePath("push", ["pusher_name", "sig", "title", "text", "*"])
 def _pushhandler(name, sig, title, text="", *args, **kwargs):
     logger.info("Pushing {}: {}.".format(title, text))
-    message = ""
+
+    logger.warn(kwargs["original_path_parts"])
+    # Look up name to get secret
+    secret = kwargs["pushers"].get(name)
+    if not secret:
+        return "Pusher '{}' is not registered.\n"
+    # Check if secret is correct:
+    sig_calc = hashlib.sha224(
+        "{}/{}/".format(secret,"/".join(kwargs["original_path_parts"][2:])).encode('utf-8')).hexdigest()
+    if sig_calc != sig:
+        return "Signature error.\n"
 
     notif = {
         "title": title,
@@ -119,8 +130,7 @@ def _pushhandler(name, sig, title, text="", *args, **kwargs):
             vapid_private_key=PATH_PEM,
             vapid_claims={"sub": "mailto:" + ADMIN_EMAIL})
 
-    success = not message
-    return returnJSON({"success": success, "message": message})
+    return ""
 ALL_ENDPOINTS.append(EndpointHandler("PushHandler", "/push/", _pushhandler))
 
 

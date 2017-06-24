@@ -35,8 +35,11 @@ class RegistrationManager(object):
     def get(self, name):
         try:
             return self.clients[name]
-        except:
+        except KeyError:
             return None
 
     def values(self):
         return self.clients.values()
+
+    def __repr__(self):
+        return self.clients.__repr__()

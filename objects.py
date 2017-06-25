@@ -104,7 +104,7 @@ class Client(object):
 
     def getData(self, **kwargs):
         rv = {k: self.__getattribute__(k) for k in ["name", "created", "lastseen", "browser", "machine"]}
-        rv["style"] = kwargs["styles"].get(self)
+        rv["style"] = kwargs["styles"].get(self.name)
         return rv
 
 
@@ -117,5 +117,5 @@ class Pusher(object):
 
     def getData(self, **kwargs):
         rv = {k: self.__getattribute__(k) for k in ["name", "lastseen", "created"]}
-        rv["style"] = kwargs["styles"].get(self)
+        rv["style"] = kwargs["styles"].get(self.name)
         return rv

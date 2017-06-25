@@ -123,7 +123,7 @@ def _removeconn(clpu, name, **kwargs):
             if not kwargs["clients"].get(name):
                 kwargs["styles"].anull(name)
     else:
-        msg = "Specify either client or pusher."
+        msg = "Can only remove pushers."
     return returnJSON({ "success": not msg, "message": msg })
 ALL_ENDPOINTS.append(EndpointHandler("RemoveConnectionHandler", "/remove/", _removeconn))
 

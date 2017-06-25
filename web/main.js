@@ -223,12 +223,8 @@ function updateSubscriptionOnServer(subscription){
     if (device_name == null)
         return;
     name = encodeURIComponent(device_name)
-    var url="/remove/clients/" + name + "/"
-    if(subscription != null) {
-        subscription = JSON.stringify(subscription).replace(/\//g,"%2F");
-        url = '/register/' + name + "/" + subscription
-    }
-    fetch(url).then(jsonMap).then(handleStandardJSON).catch(handleSetupError);
+    subscription = JSON.stringify(subscription).replace(/\//g,"%2F");
+    fetch('/register/' + name + "/" + subscription).then(jsonMap).then(handleStandardJSON).catch(handleSetupError);
 }
 
 // Add new client

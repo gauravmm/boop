@@ -7,6 +7,14 @@ function $(id) {
     return document.getElementById(id);
 }
 
+function fetchAuth(url){
+    if(CONFIG.auth)
+        return fetch(url, {
+            headers: { 'Authorization': CONFIG.auth }
+        });
+    return fetch(url);
+}
+
 function urlB64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding)
@@ -106,7 +114,7 @@ function initializeUI() {
 function deleteDevice(node, group, name) {
     if(group == "pushers") {
         node.parentNode.removeChild(node);
-        fetch("remove/" + group + "/" + name + "/").then(jsonMap).catch(handleSetupError);
+        fetchAuth("remove/" + group + "/" + name + "/").then(jsonMap).catch(handleSetupError);
         getDeviceStatus();
     } else {
         alert(`Open ${CONFIG.url} on ${name}, and disable notifications by clicking the "Disable Notifications" button there.`)
@@ -173,7 +181,7 @@ function populateList(node, group, list) {
 }
 
 function getDeviceStatus() {
-    fetch('/getconn/').then(jsonMap).then(function(response) {
+    fetchAuth('/getconn/').then(jsonMap).then(function(response) {
         console.log("Conn:", response)
         populateList($("client-list"), "clients", response.clients)
         populateList($("pusher-list"), "pushers", response.pushers)
@@ -224,7 +232,7 @@ function updateSubscriptionOnServer(subscription){
         return;
     name = encodeURIComponent(device_name)
     subscription = JSON.stringify(subscription).replace(/\//g,"%2F");
-    fetch('/register/' + name + "/" + subscription).then(jsonMap).then(handleStandardJSON).catch(handleSetupError);
+    fetchAuth('/register/' + name + "/" + subscription).then(jsonMap).then(handleStandardJSON).catch(handleSetupError);
 }
 
 // Add new client
@@ -237,7 +245,7 @@ $("pusher-new").onclick = function() {
         $("pusher-new").className = "button button-active";
         return;
     }
-    fetch('/addpusher/' + encodeURIComponent(device_name) + "/").then(jsonMap).then(function(response) {
+    fetchAuth('/addpusher/' + encodeURIComponent(device_name) + "/").then(jsonMap).then(function(response) {
         console.log("Pusher-new: ", response);
         if(!response.success)
             return Promise.reject(response.message);

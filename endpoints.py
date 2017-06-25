@@ -228,7 +228,8 @@ def _confighandler(path, **kwargs):
     rv += "\n"
     rv += "const CONFIG = " + json.dumps({
         "server_key": SERVER_KEY,
-        "url": SERVER_URL
+        "url": SERVER_URL,
+        "auth": authstr
     })
     return rv.encode('utf-8')
 ALL_ENDPOINTS.append(EndpointHandler("ConfigHandler", "/config.js", _confighandler))

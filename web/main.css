@@ -86,6 +86,7 @@ nav a {
     min-width: 100px;
     height: 28px;
     margin: 6px 4px 6px 0;
+    padding: 0 6px;
     line-height: 28px;
     border: thin solid #EEE;
     text-align: center;

@@ -1,3 +1,4 @@
+import base64
 import hashlib
 import json
 import logging
@@ -7,10 +8,9 @@ import urllib
 import uuid
 from pathlib import Path
 
-from pywebpush import WebPushException, webpush
-
 from config import *
 from objects import Client, Pusher
+from pywebpush import WebPushException, webpush
 
 logger = logging.getLogger("boop.endpoints")
 
@@ -72,6 +72,26 @@ def parsePath(nm, vars):
         return func_wrapper
     return decorate 
 
+authstr = "Basic " + base64.b64encode((AUTH_USERNAME + ":" + AUTH_PASSWORD).encode("utf-8")).decode("utf-8")
+def httpAuth(func):
+    def checkAuthHeaders(h):
+        if "Authorization" not in h:
+            return False
+        logger.info(h["Authorization"].strip() + " vs " + authstr)
+        if h["Authorization"].strip() == authstr:
+            return True
+        return False
+
+    def func_wrapper(*args, **kwargs):
+        if not AUTH_ENABLE or checkAuthHeaders(kwargs["headers"]):
+            return func(*args, **kwargs)
+        # Return the authentication request headers:
+        return ("HTTP/1.1 401 Access Denied\n" + \
+            "WWW-Authenticate: Basic realm=\"Boop\"\n" + \
+            "Content-Length: 0\n\n").encode("utf-8")
+
+    return func_wrapper
+
 
 #
 # /register/<name>/<subscription>
@@ -102,6 +122,7 @@ ALL_ENDPOINTS.append(EndpointHandler("AcknowledgementHandler", "/touch/", _touch
 #
 # /addpusher/name/
 #
+@httpAuth
 @parsePath("addpusher", ["name"])
 def _addpusherhandler(name, **kwargs):
     auth = str(uuid.uuid4())
@@ -113,6 +134,7 @@ ALL_ENDPOINTS.append(EndpointHandler("AddPusherHandler", "/addpusher/", _addpush
 #
 # /remove/<client|pusher>/name/
 #
+@httpAuth
 @parsePath("remove", ["pushers", "name"])
 def _removeconn(clpu, name, **kwargs):
     if clpu == "pushers":
@@ -132,6 +154,7 @@ ALL_ENDPOINTS.append(EndpointHandler("RemoveConnectionHandler", "/remove/", _rem
 #
 # /getconn/
 #
+@httpAuth
 @parsePath("getconn", [])
 def _getconn(**kwargs):
     return returnJSON({
@@ -197,6 +220,7 @@ ALL_ENDPOINTS.append(EndpointHandler("PushHandler", "/push/", _pushhandler))
 #
 # /config.js
 #
+@httpAuth
 def _confighandler(path, **kwargs):
     # Handle the generation of config.js
     rv = "HTTP/1.x 200 OK\n"
@@ -213,6 +237,7 @@ ALL_ENDPOINTS.append(EndpointHandler("ConfigHandler", "/config.js", _confighandl
 #
 # /**
 #
+@httpAuth
 def _filehandler(path, **kwargs):
     # Any errors raised are returned as HTTP/500 automatically.
     qpos = path.find("?")
@@ -228,7 +253,7 @@ def _filehandler(path, **kwargs):
 
     if abs_path.exists():
         typ, enc = mimetypes.guess_type(str(abs_path))
-        rv = "HTTP/1.x 200 OK\n"
+        rv = "HTTP/1.1 200 OK\n"
         if typ:
             rv += "Content-Type: " + typ + "\n"
         if enc:

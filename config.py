@@ -21,3 +21,7 @@ MAX_DELAY=60
 STYLE_IMAGE=["icons/bell{}.png".format(x) for x in range(7)]
 STYLE_COLOR=["#C18F72", "#510068", "#FFBB53", "#FF6C51", "#00B0A0", "#2D393E", "#5B4F50"]
 STYLE_CLASS=["style-color-{}".format(x) for x in range(7)]
+
+AUTH_ENABLE=True
+AUTH_USERNAME="gaurav"
+AUTH_PASSWORD="Twerp!"

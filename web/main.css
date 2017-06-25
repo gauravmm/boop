@@ -25,7 +25,7 @@ body {
     border-bottom: #999 thick solid;
 }
 
-@media screen and (min-width: 1024px) {
+@media screen and (min-width: 800px) {
     .bar-left {
         width: 450px;
         padding: 0 10px 0;

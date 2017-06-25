@@ -77,8 +77,8 @@ def httpAuth(func):
     def checkAuthHeaders(h):
         if "Authorization" not in h:
             return False
-        logger.info(h["Authorization"].strip() + " vs " + authstr)
         if h["Authorization"].strip() == authstr:
+            logger.info("Failed auth" + h["Authorization"].strip() + " vs " + authstr)
             return True
         return False
 

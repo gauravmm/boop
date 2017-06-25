@@ -1,0 +1,272 @@
+body, html {
+    width: 100%;
+    height: 100%;
+}
+
+body, html, nav, ul, li, h1, h2, h3, span, p, pre {
+    margin: 0;
+    padding: 0;
+}
+
+h3 {
+    margin: 12px 0 6px;
+}
+
+body {
+    background: #EEE;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.hidden {display: none;}
+
+.bar-left {
+    width: 100%;
+    background: #FFF;
+    border-bottom: #999 thick solid;
+}
+
+@media screen and (min-width: 800px) {
+    .bar-left {
+        width: 450px;
+        padding: 0 10px 0;
+        min-height: 100%;
+        border-right: #999 thick solid;
+        border-bottom: none;
+    }
+    .bar-inner {
+        padding-top: 60px;
+    }
+    header {
+        position: absolute;
+        top: 0;
+    }
+}
+
+
+/* Header */
+header {
+    display: block;
+    background: rgb(80,156,240);
+    color: #FFF;
+    box-shadow: 0px 1px 5px 0px rgba(0,0,0,0.6);
+    width: 100%;
+    height: 40px;
+}
+
+header #logo {
+    width: 24px;
+    height: 24px;
+    margin: 6px 12px 6px;
+    float: left;
+}
+
+header h1 {
+    font-size: 24px;
+    padding: 4px 0 0;
+    display: inline-block;
+}
+header span {
+    font-style: italic;
+}
+
+nav {
+    float: right;
+}
+nav ul {
+    list-style: none;
+}
+nav ul li {
+    display: inline;
+}
+nav li:last-child {
+    margin-right: 10px;
+}
+nav a {
+    display: inline-block;
+    min-width: 100px;
+    height: 28px;
+    margin: 6px 4px 6px 0;
+    padding: 0 6px;
+    line-height: 28px;
+    border: thin solid #EEE;
+    text-align: center;
+}
+nav a, nav a:hover {
+    color: #EEE;
+    text-decoration: none;
+}
+nav a#device-name {
+    background: #407cc0;
+    font-style: italic;
+}
+nav a:hover, nav a#device-name:hover {
+    background: #84b9f4;
+}
+
+header::after{
+    clear: both;
+}
+
+
+/* Buttons */
+.button {
+    position: relative;
+    width: 100%;
+    line-height: 36px;
+    margin: 0 0 8px 0;
+    color: #FFF;
+    background: #DDD;
+    border: none;
+    text-align: center;
+    cursor: not-allowed;
+    text-transform: uppercase;
+    font-weight: bold;
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.3);
+}
+.button-active:hover, .button-selected:hover {
+    top: 2px;
+    box-shadow: 0 1px 3px 0px rgba(0,0,0,0.3);
+}
+.button-active {
+    background: #B1499E;
+    color: #FFF;
+    cursor: pointer;
+}
+.button-selected {
+    background: #3BB603;
+    color: #FFF;
+    cursor: pointer;
+}
+.button > .if-notif-enabled,
+.button > .if-notif-disabled,
+.button > .if-notif-processing,
+.button > .if-notif-error {
+    display: none;
+}
+.button-selected > .if-notif-enabled {
+    display: inline;
+}
+.button-active > .if-notif-disabled {
+    display: inline;
+}
+.button-processing > .if-notif-processing {
+    display: inline;
+}
+.button-error > .if-notif-error {
+    display: inline;
+}
+
+
+/* Error handling */
+.alert {
+    width: 48px;
+    height: 48px;
+    position: absolute;
+    top: 4px;
+    left: 4px;
+}
+.error {
+    margin: 8px 0 16px;
+    position: relative;
+    background: #F44763;
+    border: thin solid #F44763;
+    min-height: 56px;
+}
+.error span {
+    font-weight: bold;
+    color: #F44763;
+}
+.error-msg {
+    background: #FFF;
+    min-height: 56px;
+    margin-left: 56px;
+    padding-left: 8px;
+}
+.error-msg p {
+    font-style: italic;
+}
+
+/* Code */
+/* New Pusher */
+#newpusher {
+    border: thin solid #CCC;
+    background: #F3F3F3;
+    padding: 6px;
+    box-shadow: 0 1px 3px 0px rgba(0,0,0,0.3);
+}
+
+.code {
+    font-family: Courier New, Courier, monospace;
+    font-size: 9pt;
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    overflow: auto;
+    padding: 4px;
+    background: #FFF;
+    border: thin solid #CCC;
+}
+
+.once-warn {
+    color: #999;
+    font-size: 9pt;
+    margin: 4px 0;
+    text-align: center;
+    font-style: italic;
+}
+
+/* Color Styles */
+/* #C18F72, #510068, #FFBB53, #FF6C51, #00B0A0, #2D393E, #5B4F50 */
+span.style-color-0 { background: #C18F72 }
+span.style-color-1 { background: #510068 }
+span.style-color-2 { background: #FFBB53 }
+span.style-color-3 { background: #FF6C51 }
+span.style-color-4 { background: #00B0A0 }
+span.style-color-5 { background: #2D393E }
+span.style-color-6 { background: #5B4F50 }
+
+
+/* Device List */
+.device-list {
+    list-style: none;
+    margin: 8px 0 16px;
+}
+.device-list li {
+    display: block;
+    position: relative;
+    margin: 8px 0 0;
+    height: 48px;
+    border: thin solid #CCC;
+    box-shadow: 0 1px 3px 0px rgba(0,0,0,0.3);
+}
+.device-list li * {
+    position: absolute;
+}
+.device-list li img {
+    width: 48px;
+    height: 48px;
+}
+.device-list .d-x {
+    right: 0; top: 0;
+    padding: 2px 4px 2px 4px;
+    cursor: pointer;
+    color: rgba(255,255,255,.6);
+}
+.device-list .d-x:hover {
+    color: rgba(255,255,255,1);
+    background: rgba(255, 255, 255, .1)
+}
+.device-list .d-name {
+    box-sizing: border-box;
+    width: 100%;
+    top: 0; left: 0;
+    padding: 2px 54px 2px;
+    font-weight: bold;
+    color: #FFF;
+}
+.device-list .d-since {
+    top: 1.5em; right: 0;
+    text-align: right;
+    padding: 4px 4px 0 0;
+    color: #999;
+}

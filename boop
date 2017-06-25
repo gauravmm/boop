@@ -1,0 +1,15 @@
+#!/bin/bash
+set -e
+CODEROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$CODEROOT"
+
+# Generate the private key if it is not already done:
+if [[ ! -f public_key.pem || ! -f private_key.pem || ! -f applicationServerKey ]]; then
+    echo "Generating new keys."
+    vapid --gen
+    chmod 0600 private_key.pem
+    vapid --applicationServerKey | sed -re "s/^Application Server Key = //" > applicationServerKey
+fi
+
+# Run boop:
+python3 boop.py 

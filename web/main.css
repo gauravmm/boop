@@ -122,7 +122,7 @@ header::after{
     font-weight: bold;
     box-shadow: 0 2px 5px 0 rgba(0,0,0,0.3);
 }
-.button-active:hover, .button-selected {
+.button-active:hover, .button-selected:hover {
     top: 2px;
     box-shadow: 0 1px 3px 0px rgba(0,0,0,0.3);
 }
@@ -200,10 +200,55 @@ header::after{
 
 /* Color Styles */
 /* #C18F72, #510068, #FFBB53, #FF6C51, #00B0A0, #2D393E, #5B4F50 */
-span.style-color-0 { color: #C18F72 }
-span.style-color-1 { color: #510068 }
-span.style-color-2 { color: #FFBB53 }
-span.style-color-3 { color: #FF6C51 }
-span.style-color-4 { color: #00B0A0 }
-span.style-color-5 { color: #2D393E }
-span.style-color-6 { color: #5B4F50 }
+span.style-color-0 { background: #C18F72 }
+span.style-color-1 { background: #510068 }
+span.style-color-2 { background: #FFBB53 }
+span.style-color-3 { background: #FF6C51 }
+span.style-color-4 { background: #00B0A0 }
+span.style-color-5 { background: #2D393E }
+span.style-color-6 { background: #5B4F50 }
+
+
+/* Device List */
+.device-list {
+    list-style: none;
+    margin: 0 0 16px;
+}
+.device-list li {
+    display: block;
+    position: relative;
+    height: 48px;
+    border: thin solid #CCC;
+    box-shadow: 0 1px 3px 0px rgba(0,0,0,0.3);
+}
+.device-list li * {
+    position: absolute;
+}
+.device-list li img {
+    width: 48px;
+    height: 48px;
+}
+.device-list .d-x {
+    right: 0; top: 0;
+    padding: 2px 4px 2px 4px;
+    cursor: pointer;
+    color: rgba(255,255,255,.6);
+}
+.device-list .d-x:hover {
+    color: rgba(255,255,255,1);
+    background: rgba(255, 255, 255, .1)
+}
+.device-list .d-name {
+    box-sizing: border-box;
+    width: 100%;
+    top: 0; left: 0;
+    padding: 2px 54px 2px;
+    font-weight: bold;
+    color: #FFF;
+}
+.device-list .d-since {
+    top: 1.5em; right: 0;
+    text-align: right;
+    padding: 4px 4px 0 0;
+    color: #999;
+}

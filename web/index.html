@@ -33,15 +33,17 @@
                 <p id="notif-enable-err-msg">Unknown error occurred.</p>
             </div>
         </div>
+        <h2>Clients</h2>
         <button id="notif-enable" class="button button-disabled" disabled>
             <span class="if-notif-error">Notifications Are Not Supported On This Device</span>
             <span class="if-notif-processing">Processing...</span>
             <span class="if-notif-enabled">Disable Notifications On This Device</span>
             <span class="if-notif-disabled">Enable Notifications On This Device</span>
         </button>
-        <ul id="client-list"></ul>
+        <ul id="client-list" class="device-list"></ul>
+        <h2>Pushers</h2>
         <button id="pusher-new" class="button button-active" disabled>
-            Push From A New Device
+            Push From This Device
         </button>
         <div id="newpusher" class="hidden">
             <h3>Auth Code</h3>
@@ -49,7 +51,7 @@
             <h3>.bashrc</h3>
             <pre id="newpusher-bashrc" class="code"></pre>
         </div>
-        <ul id="pusher-list"></ul>
+        <ul id="pusher-list" class="device-list"></ul>
     </div></div>
     <div id="content">
     </div>

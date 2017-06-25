@@ -22,6 +22,13 @@ function urlB64ToUint8Array(base64String) {
   return outputArray;
 }
 
+// Decode JSON if fetch is processed successfully.
+function jsonMap(r) {
+    if(!r.ok)
+        return Promise.reject(r.status + " " + r.statusText);
+    return r.json()
+}
+
 function handleSetupError(error, recoverable=false){
     console.error('Setup Error', error);
     $("notif-enable-err").className = "error";
@@ -91,8 +98,32 @@ function initializeUI() {
     getDeviceStatus();
 }
 
-function deleteDevice(url) {
-    console.log(url)
+function deleteDevice(node, url) {
+    node.parentNode.removeChild(node);
+    fetch(url).then(jsonMap).reject(handleSetupError);
+    getDeviceStatus();
+}
+
+function durationString(dur) {
+    if (dur < 30)	            return "just now";
+    if (dur < 60 * 1.5)	        return "a minute ago";
+    if (dur < 60 * 2.5)	        return "a few minutes ago";
+    if (dur < 60 * 7.5)	        return "five minutes ago";
+    if (dur < 60 * 12.5)	    return "ten minutes ago";
+    if (dur < 60 * 20)	        return "fifteen minutes ago";
+    if (dur < 60 * 45)	        return "half an hour ago";
+    if (dur < 3600 * 1.25)	    return "an hour ago";
+    if (dur < 3600 * 2.5)	    return "two hours ago";
+    if (dur < 3600 * 8)	        return "a few hours ago";
+    if (dur < 3600 * 16)	    return "half a day ago";
+    if (dur < 3600 * 32)	    return "a day ago";
+    if (dur < 3600 * 24 * 2.5)	return "two days ago";
+    if (dur < 3600 * 24 * 5)	return "a few days ago";
+    if (dur < 3600 * 24 * 10)	return "a few week ago";
+    if (dur < 3600 * 24 * 20)	return "two weeks ago";
+    if (dur < 3600 * 24 * 40)	return "a few weeks ago";
+    if (dur < 3600 * 24 * 60)	return "a few months ago";
+    return "a long time ago";
 }
 
 function populateList(node, list) {
@@ -101,37 +132,37 @@ function populateList(node, list) {
     node.parentNode.replaceChild(cNode, node);
     node = cNode
 
+    var nowtime = Math.floor(Date.now() / 1000);
+
     list.forEach(function(e) {
         var root = document.createElement("li");
-
-        var icon = document.createElement("img");
-        icon.src = e.style.icon;
-        root.appendChild(icon);
-
-        var del = document.createElement("span");
-        del.innerText = "X";
-        del.className = "d-x"
-        del.onclick = ()=>deleteDevice(e.name);
-        root.appendChild(del);
 
         var name = document.createElement("span");
         name.innerText = e.name;
         name.className = "d-name " + e.style.class
         root.appendChild(name);
 
+        var icon = document.createElement("img");
+        icon.src = e.style.icon;
+        root.appendChild(icon);
+
+        var del = document.createElement("span");
+        del.innerText = "remove";
+        del.className = "d-x"
+        del.onclick = ()=>deleteDevice(del, e.name);
+        root.appendChild(del);
+
         var since = document.createElement("span");
-        since.innerText = e.lastseen;
+        since.innerText = "Last seen " + durationString(nowtime - e.lastseen);
         since.className = "d-since"
         root.appendChild(since);
 
         node.appendChild(root);
     });
-
-    node.className = "";
 }
 
 function getDeviceStatus() {
-    fetch('/getconn/').then((r)=>r.json()).then(function(response) {
+    fetch('/getconn/').then(jsonMap).then(function(response) {
         console.log("Conn:", response)
         populateList($("client-list"), response.clients)
         populateList($("pusher-list"), response.pushers)
@@ -180,7 +211,7 @@ function updateSubscriptionOnServer(subscription){
         return;
     subscription = JSON.stringify(subscription).replace(/\//g,"%2F");
     $("content").innerText=subscription;
-    fetch('/register/' + encodeURIComponent(name) + "/" + subscription).then((r)=>r.json()).then(function(response) {
+    fetch('/register/' + encodeURIComponent(name) + "/" + subscription).then(jsonMap).then(function(response) {
         console.log("Response: ", response);
         if(!response.success)
             return Promise.reject(response.message);
@@ -197,7 +228,7 @@ $("pusher-new").onclick = function() {
         $("pusher-new").className = "button button-active";
         return;
     }
-    fetch('/addpusher/' + encodeURIComponent(device_name) + "/").then((r)=>r.json()).then(function(response) {
+    fetch('/addpusher/' + encodeURIComponent(device_name) + "/").then(jsonMap).then(function(response) {
         console.log("Pusher-new: ", response);
         if(!response.success)
             return Promise.reject(response.message);

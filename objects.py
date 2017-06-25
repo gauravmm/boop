@@ -65,9 +65,9 @@ class StyleManager(object):
             logger.warn("StyleManager database does not exist or cannot be read. Starting with empty database.")
             self.names = []
     
-    def get(self, obj):
+    def get(self, name):
         try:
-            idx = self.names.index(obj.name)
+            idx = self.names.index(name)
         except:
             # First try to find the first deleted slot
             try:
@@ -76,7 +76,7 @@ class StyleManager(object):
                 idx = len(self.names)
 
             if idx <= self.max_clients:
-                self.names.append(obj.name)
+                self.names.append(name)
                 self.fn.write_bytes(pickle.dumps(self.names))
 
         idx = idx % len(STYLE_IMAGE)
@@ -86,9 +86,9 @@ class StyleManager(object):
             "class": STYLE_CLASS[idx]
         }
 
-    def anull(self, obj):
+    def anull(self, name):
         try:
-            idx = self.names.index(obj.name)
+            idx = self.names.index(name)
             self.names[idx] = None
         except:
             pass

@@ -186,6 +186,14 @@ header::after{
 }
 
 /* Code */
+/* New Pusher */
+#newpusher {
+    border: thin solid #CCC;
+    background: #F3F3F3;
+    padding: 6px;
+    box-shadow: 0 1px 3px 0px rgba(0,0,0,0.3);
+}
+
 .code {
     font-family: Courier New, Courier, monospace;
     font-size: 9pt;
@@ -194,8 +202,16 @@ header::after{
     width: 100%;
     overflow: auto;
     padding: 4px;
-    background: #F3F3F3;
+    background: #FFF;
     border: thin solid #CCC;
+}
+
+.once-warn {
+    color: #999;
+    font-size: 9pt;
+    margin: 4px 0;
+    text-align: center;
+    font-style: italic;
 }
 
 /* Color Styles */
@@ -212,7 +228,7 @@ span.style-color-6 { background: #5B4F50 }
 /* Device List */
 .device-list {
     list-style: none;
-    margin: 0 0 16px;
+    margin: 8px 0 16px;
 }
 .device-list li {
     display: block;

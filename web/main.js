@@ -26,7 +26,14 @@ function urlB64ToUint8Array(base64String) {
 function jsonMap(r) {
     if(!r.ok)
         return Promise.reject(r.status + " " + r.statusText);
-    return r.json()
+    return r.json();
+}
+
+function handleStandardJSON(response) {
+    console.log("Response: ", response);
+    if(!response.success)
+            return Promise.reject(response.message);
+    return Promise.resolve();
 }
 
 function handleSetupError(error, recoverable=false){
@@ -34,7 +41,7 @@ function handleSetupError(error, recoverable=false){
     $("notif-enable-err").className = "error";
     $("notif-enable-err-msg").innerHTML = error;
     if(recoverable)
-        return
+        return;
     $("notif-enable").className = "button button-error";
     $("notif-enable").disabled = true;
 }
@@ -60,10 +67,8 @@ function updateButton() {
         return;
     }
     if (isSubscribed) {
-        console.log('User IS subscribed.');
         $("notif-enable").className="button button-selected";
     } else {
-        console.log('User is NOT subscribed.');
         $("notif-enable").className="button button-active";
     }
     $("notif-enable").disabled = false;
@@ -98,10 +103,14 @@ function initializeUI() {
     getDeviceStatus();
 }
 
-function deleteDevice(node, url) {
-    node.parentNode.removeChild(node);
-    fetch(url).then(jsonMap).reject(handleSetupError);
-    getDeviceStatus();
+function deleteDevice(node, group, name) {
+    if(group == "pushers") {
+        node.parentNode.removeChild(node);
+        fetch("remove/" + group + "/" + name + "/").then(jsonMap).catch(handleSetupError);
+        getDeviceStatus();
+    } else {
+        alert(`Open ${CONFIG.url} on ${name}, and disable notifications by clicking the "Disable Notifications" button there.`)
+    }
 }
 
 function durationString(dur) {
@@ -126,7 +135,7 @@ function durationString(dur) {
     return "a long time ago";
 }
 
-function populateList(node, list) {
+function populateList(node, group, list) {
     // Remove all children: https://stackoverflow.com/a/22966637
     var cNode = node.cloneNode(false);
     node.parentNode.replaceChild(cNode, node);
@@ -146,11 +155,13 @@ function populateList(node, list) {
         icon.src = e.style.icon;
         root.appendChild(icon);
 
-        var del = document.createElement("span");
-        del.innerText = "remove";
-        del.className = "d-x"
-        del.onclick = ()=>deleteDevice(del, e.name);
-        root.appendChild(del);
+        if(group == "pushers"){
+            var del = document.createElement("span");
+            del.innerText = "remove";
+            del.className = "d-x"
+            del.onclick = ()=>deleteDevice(del, group, e.name);
+            root.appendChild(del);
+        }
 
         var since = document.createElement("span");
         since.innerText = "Last seen " + durationString(nowtime - e.lastseen);
@@ -164,8 +175,8 @@ function populateList(node, list) {
 function getDeviceStatus() {
     fetch('/getconn/').then(jsonMap).then(function(response) {
         console.log("Conn:", response)
-        populateList($("client-list"), response.clients)
-        populateList($("pusher-list"), response.pushers)
+        populateList($("client-list"), "clients", response.clients)
+        populateList($("pusher-list"), "pushers", response.pushers)
     }).catch(handleSetupError);
 }
 
@@ -178,6 +189,7 @@ function subscribeUser() {
         updateSubscriptionOnServer(subscription);
         isSubscribed = true;
         updateButton();
+        getDeviceStatus();
     }).catch(handleSetupError);
 }
 function unsubscribeUser() {
@@ -188,6 +200,7 @@ function unsubscribeUser() {
         updateSubscriptionOnServer(null);
         isSubscribed = false;
         updateButton();
+        getDeviceStatus();
     }).catch(handleSetupError);
 }
 
@@ -209,13 +222,13 @@ function updateSubscriptionOnServer(subscription){
     device_name = getAndUpdateName()
     if (device_name == null)
         return;
-    subscription = JSON.stringify(subscription).replace(/\//g,"%2F");
-    $("content").innerText=subscription;
-    fetch('/register/' + encodeURIComponent(name) + "/" + subscription).then(jsonMap).then(function(response) {
-        console.log("Response: ", response);
-        if(!response.success)
-            return Promise.reject(response.message);
-    }).catch(handleSetupError);
+    name = encodeURIComponent(device_name)
+    var url="/remove/clients/" + name + "/"
+    if(subscription != null) {
+        subscription = JSON.stringify(subscription).replace(/\//g,"%2F");
+        url = '/register/' + name + "/" + subscription
+    }
+    fetch(url).then(jsonMap).then(handleStandardJSON).catch(handleSetupError);
 }
 
 // Add new client
@@ -244,5 +257,6 @@ function boop {
     wget -qO - "${CONFIG.url}push/${device_name}/$sig/$pushstr" 1>/dev/null
 }`;
         $("newpusher").className=""
+        getDeviceStatus();
     }).catch(handleSetupError);
 }

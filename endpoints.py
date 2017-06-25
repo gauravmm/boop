@@ -110,6 +110,24 @@ def _addpusherhandler(name, **kwargs):
     return returnJSON({"success": not message, "message": message, "auth": auth})
 ALL_ENDPOINTS.append(EndpointHandler("AddPusherHandler", "/addpusher/", _addpusherhandler))
 
+#
+# /remove/<client|pusher>/name/
+#
+@parsePath("remove", ["pushers", "name"])
+def _removeconn(clpu, name, **kwargs):
+    if clpu == "pushers":
+        msg = kwargs[clpu].put(name, None)
+        if not msg:
+            # If we removed it successfully, then we check if the other regman has it.
+            # If it does not have it, then we can remove it from styleman:
+            if not kwargs["clients"].get(name):
+                kwargs["styles"].anull(name)
+    else:
+        msg = "Specify either client or pusher."
+    return returnJSON({ "success": not msg, "message": msg })
+ALL_ENDPOINTS.append(EndpointHandler("RemoveConnectionHandler", "/remove/", _removeconn))
+
+
 
 #
 # /getconn/

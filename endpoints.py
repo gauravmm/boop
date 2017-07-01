@@ -70,7 +70,7 @@ def parsePath(nm, vars):
                     "message": "Incorrect format. We expect {}/{}/{}".format(SERVER_URL, nm, "/".join("&lt;"+v+"&gt;" for v in vars))
                 })
         return func_wrapper
-    return decorate 
+    return decorate
 
 authstr = "Basic " + base64.b64encode((AUTH_USERNAME + ":" + AUTH_PASSWORD).encode("utf-8")).decode("utf-8")
 def httpAuth(func):
@@ -78,8 +78,8 @@ def httpAuth(func):
         if "Authorization" not in h:
             return False
         if h["Authorization"].strip() == authstr:
-            logger.info("Failed auth" + h["Authorization"].strip() + " vs " + authstr)
             return True
+        logger.info("Failed auth " + str(h["Authorization"]).strip() + " vs " + authstr)
         return False
 
     def func_wrapper(*args, **kwargs):
@@ -221,9 +221,9 @@ ALL_ENDPOINTS.append(EndpointHandler("PushHandler", "/push/", _pushhandler))
 # /config.js
 #
 @httpAuth
-def _confighandler(path, **kwargs):
+def _confighandler(*a, **kwargs):
     # Handle the generation of config.js
-    rv = "HTTP/1.x 200 OK\n"
+    rv = "HTTP/1.1 200 OK\n"
     rv += "Content-Type: application/javascript\n"
     rv += "\n"
     rv += "const CONFIG = " + json.dumps({
@@ -260,7 +260,7 @@ def _filehandler(path, **kwargs):
         if enc:
             rv += "Content-Encoding: " + enc + "\n"
         rv += "\n"
-        
+
         return rv.encode('utf-8') + abs_path.read_bytes()
     else:
         return ERROR_404.func(path)

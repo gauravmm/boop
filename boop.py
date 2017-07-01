@@ -1,8 +1,9 @@
 #!python3
-import http.server
 import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
+from socketserver import ThreadingMixIn
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from objects import RegManager, StyleManager
 from config import *
@@ -30,7 +31,7 @@ styleMan  = StyleManager(STYLE_MANAGER, MAX_CLIENTS)
 #
 # Handler
 #
-class BoopHTTPHandler(http.server.BaseHTTPRequestHandler):
+class BoopHTTPHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         kwargs = {
             "rfile": self.rfile,
@@ -50,6 +51,8 @@ class BoopHTTPHandler(http.server.BaseHTTPRequestHandler):
             raise
         print(self.path)
 
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    pass
 
 #
 # Init
@@ -59,7 +62,7 @@ def run():
     logger.info("Location: " + SERVER_URL)
     logger.info("Server Key: " + SERVER_KEY)
 
-    httpd = http.server.HTTPServer(SERVER_ADDR, BoopHTTPHandler)
+    httpd = ThreadedHTTPServer(SERVER_ADDR, BoopHTTPHandler)
     httpd.serve_forever()
 
 run()
